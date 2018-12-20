@@ -1,0 +1,2 @@
+logpath: "/tmp"
+addr: ":8090"

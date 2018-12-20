@@ -1,0 +1,6 @@
+
+logpath: "/Users/wangpei/test/del/test"
+chkpoint: "gatherlog/agent/register/chkpt.ini"
+host: "127.0.0.1:8090"
+buffer: 128
+interval: 1
