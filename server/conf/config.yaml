@@ -1,2 +1,3 @@
 logpath: "/tmp"
 addr: ":8090"
+pid: "gatherlog/server/run/gatherlog.pid"

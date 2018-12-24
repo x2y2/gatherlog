@@ -1,4 +1,4 @@
-package gather
+package logs
 
 import (
 	"os"
@@ -44,9 +44,6 @@ func TailLog(offset int64,logfile string) string{
 
 func ReadData(chkpt,logfile string)string{
 	offset := chkpoint.Chkpt(chkpt,logfile,"Offset")
-	//if string(offset) == ""{
-	//	offset = int64(0)
-	//}
 	fileinfo,err := os.Stat(logfile)
 	if err != nil{log.Fatal(err)}
 	size := fileinfo.Size()
@@ -88,28 +85,27 @@ type Result struct{
 func ReadBigFile(file string,fd *os.File,size int64) string{
 	c := common.Config{}
 	config := c.ParseConfig()
-	//每次读取Buffer字节的内容
+
 	for {
 		bufset := chkpoint.GetChkpt(config.Chkpoint,file,"Bufset")
 
 		fd.Seek(bufset,0)
-
+		//每次读取Buffer字节的内容
 		Buffer := config.Buffer
 		s := make([]byte,Buffer)
-		nr ,err := fd.Read(s[:])
 
-		bufset =  int64(int(bufset) + nr)
-
+		nr,err := fd.Read(s)
+		if err != nil || err == io.EOF{break}
+		//记录读取到大文件的位置
 		Lock := new(sync.Mutex)
 		Lock.Lock()
-		chkpoint.SetChkpt(config.Chkpoint,file,"Bufset",strconv.FormatInt(bufset,10))
+		chkpoint.SetChkpt(config.Chkpoint,file,"Bufset",strconv.FormatInt(int64(int(bufset) + nr),10))
 		Lock.Unlock()
 
-		if err != nil || err == io.EOF{
-			break
-		}
-		return string(s[:nr])
+
+		return string(s)
 	}
+	//一个大文件从头读到当前位置后记录下offset,后面开始实时读取
 	Lock := new(sync.Mutex)
 	Lock.Lock()
 	chkpoint.SetChkpt(config.Chkpoint,file,"Offset",strconv.FormatInt(size,10))

@@ -6,11 +6,10 @@ import (
 	"gatherlog/agent/gather"
 	"gatherlog/agent/common"
 	"net/rpc"
-	"net/rpc/jsonrpc"
 	"time"
+	"github.com/wonderivan/logger"
+	"net/rpc/jsonrpc"
 	"math"
-	"log"
-	"fmt"
 )
 
 type Log struct {}
@@ -35,7 +34,7 @@ func (this RpcServer)RpcConn() (*rpc.Client,error){
 	for {
 		conn, err := jsonrpc.Dial(this.Protocol,this.Host)
 		if err != nil{
-			log.Fatal("dailing error:",err)
+			logger.Error("dailing err %s",err)
 			if retry > 3 {
 				return nil,err
 			}
@@ -43,35 +42,35 @@ func (this RpcServer)RpcConn() (*rpc.Client,error){
 			retry++
 			continue
 		}
-		fmt.Printf("connect to %s\n",this.Host)
+		logger.Info("connect to %s\n",this.Host)
 		return conn,nil
 	}
 }
+
 
 func (this RpcServer)RpcStart() error{
 	IP := ip.GetIP()
 
 	c := common.Config{}
 	config := c.ParseConfig()
-
-	conn, err := this.RpcConn()
+	conn, _ := this.RpcConn()
 	defer conn.Close()
-	if err != nil{return err}
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func(){
 		defer  wg.Done()
 		for {
-			for ch := range gather.SendLog(){
+			for ch := range logs.SendLog(){
 				if ch.Data == "" {
 					continue
 				}
 				req := LogRequest{ch.Path,ch.Data,IP}
 				res := LogResponse{}
-				err := conn.Call("Log.ShowLog",req,&res)
+				err := conn.Call("Log.ReciveLog",req,&res)
 				if err != nil{
-					log.Fatal("error:",err)
+					logger.Error("call fail")
+					conn.Close()
 				}
 			}
 			time.Sleep(time.Second * config.Interval)
