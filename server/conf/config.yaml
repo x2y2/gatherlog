@@ -1,3 +1,4 @@
 logpath: "/tmp"
 addr: ":8090"
-pid: "gatherlog/server/run/gatherlog.pid"
+pid: "/Users/wangpei/Documents/GitHub/go/src/gatherlog/server/run/gatherlog.pid"
+log: "gatherlog/server/logs"

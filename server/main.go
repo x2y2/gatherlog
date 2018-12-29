@@ -1,7 +1,10 @@
 package main
 
-import "gatherlog/server/grpc"
+import (
+	"gatherlog/server/rpcx"
+)
 
 func main(){
-	g.GRpcStart()
+	// common.Log()
+	rpcx.RpcxStart()
 }

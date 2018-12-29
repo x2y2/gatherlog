@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package gather;
+
+service GatherLog{
+    rpc Get(RequestLog) returns (ResponseLog){}
+}
+
+message RequestLog{
+    string FileName = 1;
+    string Content = 2;
+}
+
+message ResponseLog{}

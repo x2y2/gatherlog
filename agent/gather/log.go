@@ -1,4 +1,4 @@
-package logs
+package gather
 
 import (
 	"os"
@@ -101,8 +101,6 @@ func ReadBigFile(file string,fd *os.File,size int64) string{
 		Lock.Lock()
 		chkpoint.SetChkpt(config.Chkpoint,file,"Bufset",strconv.FormatInt(int64(int(bufset) + nr),10))
 		Lock.Unlock()
-
-
 		return string(s)
 	}
 	//一个大文件从头读到当前位置后记录下offset,后面开始实时读取
@@ -112,6 +110,7 @@ func ReadBigFile(file string,fd *os.File,size int64) string{
 	Lock.Unlock()
 	return ""
 }
+
 
 func SendLog() chan Result{
 	c := common.Config{}

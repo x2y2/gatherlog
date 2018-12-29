@@ -16,7 +16,7 @@ type Config struct {
 }
 
 func (this *Config)ParseConfig() *Config{
-	conf, _ := ioutil.ReadFile("gatherlog/server/conf/config.yaml")
+	conf, _ := ioutil.ReadFile("/Users/wangpei/Documents/GitHub/go/src/gatherlog/server/conf/config.yaml")
 	yaml.Unmarshal(conf,&this)
 	return this
 }
@@ -24,12 +24,16 @@ func (this *Config)ParseConfig() *Config{
 func GetPid(){
 	c := Config{}
 	config := c.ParseConfig()
-	pwd ,_ := os.Getwd()
-	fd, err := os.OpenFile(pwd + "/" + config.Pid,os.O_RDWR|os.O_CREATE, 0644)
+	
+	fd, err := os.OpenFile("/Users/wangpei/Documents/GitHub/go/src/gatherlog/server/run/" + config.Pid,os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {logger.Error(err)}
 	defer fd.Close()
 
 	pid := os.Getpid()
 	_, err = fd.Write([]byte(strconv.Itoa(pid)))
 	fd.Sync()
+}
+
+func Log(){
+	logger.SetLogger("gatherlog/server/conf/log.json")
 }
